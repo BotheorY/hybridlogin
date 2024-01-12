@@ -5,6 +5,38 @@ require_once 'vendor/autoload.php';
 
 use Hybridauth\Hybridauth; 
 
+if (!empty($_GET)) {
+    if (!empty($_GET['provider'])) {
+        $sAuth = new HybridLogin();
+        $err = '';
+        $provider = trim($_GET['provider']);
+        switch ($provider) {
+            case 'Twitter':
+                $res = $sAuth->connectToTwitter($err);
+                break;
+            case 'Google':
+                $res = $sAuth->connectToGoogle($err);
+                break;
+            case 'Facebook':
+                $res = $sAuth->connectToFacebook($err);
+                break;
+            case 'Instagram':
+                $res = $sAuth->connectToInstagram($err);
+                break;
+            case 'Amazon':
+                $res = $sAuth->connectToAmazon($err);
+                break;                                        
+            default:
+
+                break;
+        }        
+        if (!$res) {
+            echo "<p>ERROR: $err</p>";
+        } 
+        exit;       
+    }
+}
+
 if (!empty($_POST)) {
     $data = [];
     if (!empty($_POST['cmd'])) {
@@ -40,8 +72,6 @@ if (!empty($_POST)) {
                 if($res) {
                     foreach ($res as $row) {
                         if ($row['pwd'] === $password) {
-                            $data['connected'] = true;
-                        } else {
                             $config['callback'] = get_base_url() . "callback.php";
                             $hybrid_auth = new Hybridauth($config);
                             $adapter = $hybrid_auth->getAdapter(ucfirst(strtolower($accountType)));
@@ -49,21 +79,21 @@ if (!empty($_POST)) {
                                 $adapter->setAccessToken(json_decode($row['acc_data'], true));
                                 $data['connected'] = $adapter->isConnected();
                             } catch(\Exception $e) {
-
+    
                             }
-                            if ($data['connected'] === true) {
-                                $userProfile = $adapter->getUserProfile();
-                                $adapter->disconnect();
-                                $email = $row['usermail'];
-                                if ($userProfile->email !== $email) {
-                                    $email = $userProfile->email;
-                                    $db->query("UPDATE hl_user SET email = '$email' WHERE id_hl_user = {$row['id']}");
-                                }
-                                $accountType = strtoupper($accountType);
-                                setcookie('hybridlogin', "$email|$accountType|{$row['pwd']}", time() + (30 * 24 * 60 * 60), "/");
-                            } else {
-                                setcookie('hybridlogin', '', time() - 3600, '/');
+                        }
+                        if ($data['connected'] === true) {
+                            $userProfile = $adapter->getUserProfile();
+                            $adapter->disconnect();
+                            $email = $row['usermail'];
+                            if ($userProfile->email !== $email) {
+                                $email = $userProfile->email;
+                                $db->query("UPDATE hl_user SET email = '$email' WHERE id_hl_user = {$row['id']}");
                             }
+                            $accountType = strtoupper($accountType);
+                            setcookie('hybridlogin', "$email|$accountType|{$row['pwd']}", time() + (30 * 24 * 60 * 60), "/");
+                        } else {
+                            setcookie('hybridlogin', '', time() - 3600, '/');
                         }
                     }
                 }
@@ -118,7 +148,14 @@ class HybridLogin {
         try {
             $storage = new Session();
             $storage->set('provider', 'Twitter');
-            $adapter = $this->hybridauth->authenticate('Twitter');
+
+//            $adapter = $this->hybridauth->authenticate('Twitter');
+            $adapter = $this->hybridauth->getAdapter('Twitter');
+            if ($adapter->isConnected()) {
+                $adapter->disconnect();
+            }
+            $adapter->authenticate();
+
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;
@@ -137,7 +174,11 @@ class HybridLogin {
         try {
             $storage = new Session();
             $storage->set('provider', 'Google');
-            $adapter = $this->hybridauth->authenticate('Google');
+            $adapter = $this->hybridauth->getAdapter('Google');
+            if ($adapter->isConnected()) {
+                $adapter->disconnect();
+            }
+            $adapter->authenticate();
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;
@@ -156,7 +197,11 @@ class HybridLogin {
         try {
             $storage = new Session();
             $storage->set('provider', 'Facebook');
-            $adapter = $this->hybridauth->authenticate('Facebook');
+            $adapter = $this->hybridauth->getAdapter('Facebook');
+            if ($adapter->isConnected()) {
+                $adapter->disconnect();
+            }
+            $adapter->authenticate();
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;
@@ -175,7 +220,11 @@ class HybridLogin {
         try {
             $storage = new Session();
             $storage->set('provider', 'Intagram');
-            $adapter = $this->hybridauth->authenticate('Instagram');
+            $adapter = $this->hybridauth->getAdapter('Intagram');
+            if ($adapter->isConnected()) {
+                $adapter->disconnect();
+            }
+            $adapter->authenticate();
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;
@@ -194,7 +243,11 @@ class HybridLogin {
         try {
             $storage = new Session();
             $storage->set('provider', 'Amazon');
-            $adapter = $this->hybridauth->authenticate('Amazon');
+            $adapter = $this->hybridauth->getAdapter('Amazon');
+            if ($adapter->isConnected()) {
+                $adapter->disconnect();
+            }
+            $adapter->authenticate();
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;
@@ -208,37 +261,6 @@ class HybridLogin {
 
     }
 
-}
-
-if (!empty($_GET)) {
-    if (!empty($_GET['provider'])) {
-        $sAuth = new HybridLogin();
-        $err = '';
-        $provider = trim($_GET['provider']);
-        switch ($provider) {
-            case 'Twitter':
-                $res = $sAuth->connectToTwitter($err);
-                break;
-            case 'Google':
-                $res = $sAuth->connectToGoogle($err);
-                break;
-            case 'Facebook':
-                $res = $sAuth->connectToFacebook($err);
-                break;
-            case 'Instagram':
-                $res = $sAuth->connectToInstagram($err);
-                break;
-            case 'Amazon':
-                $res = $sAuth->connectToAmazon($err);
-                break;                                        
-            default:
-
-                break;
-        }        
-        if (!$res) {
-            echo "<p>ERROR: $err</p>";
-        }        
-    }
 }
 
 ?>

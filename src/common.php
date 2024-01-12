@@ -33,19 +33,14 @@ function get_base_url() {
         $protocol = 'https://';
     }
 
-    $host = $_SERVER['HTTP_HOST']; // Gets the domain name
+    $host = $_SERVER['HTTP_HOST'];
     $script = $_SERVER['SCRIPT_NAME']; 
     $url = $protocol . $host . $script;
+    $lastSlash = strrpos($url, '/');
 
-    // Trova la posizione dell'ultimo carattere '/'
-    $ultimaBarra = strrpos($url, '/');
-
-    // Se il carattere '/' è stato trovato nella stringa
-    if ($ultimaBarra !== false) {
-        // Taglia la stringa fino all'ultimo '/'
-        $stringaModificata = substr($url, 0, $ultimaBarra + 1);
+    if ($lastSlash !== false) {
+        $stringaModificata = substr($url, 0, $lastSlash + 1);
     } else {
-        // Nessuna '/' trovata, la stringa rimane invariata
         $stringaModificata = $url;
     }
 
