@@ -1,0 +1,146 @@
+<!-- Link al CSS di Bootstrap -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<style>
+	.hl-divider {
+		display: flex;
+		align-items: center;
+		text-align: center;
+	}
+	.hl-divider::before,
+	.hl-divider::after {
+		content: '';
+		flex: 1;
+		border-bottom: 1px solid #000;
+	}
+	.hl-divider::before {
+		margin-right: .25em;
+	}
+	.hl-divider::after {
+		margin-left: .25em;
+	}
+	.btn img {
+		margin-right: .25em;
+		height: 1.6em;
+		vertical-align: middle;
+	}			
+	.hl-close-button {
+		position: absolute;
+		top: -14px;
+		right: -10px;
+		font-size: 20px;
+		color: black;
+		cursor: pointer;
+	}
+	.hl-close-button img {
+		height:30px;
+	}	
+	.hl-facebook {
+		background-color: #475993; 
+		border-color: #475993; 
+		color: white;	
+	}
+	.hl-facebook:hover {
+		background-color: #253c73; /* Colore di sfondo più scuro */
+		color: white;	
+	}
+	.hl-instagram {
+		background-color: #c73283; 
+		border-color: #c73283; 
+		color: white;	
+	}
+	.hl-instagram:hover {
+		background-color: #940057; /* Colore di sfondo più scuro */
+		color: white;	
+	}
+	.hl-google {
+		background-color: #4A4A4A; 
+		border-color: #4A4A4A; 
+		color: white;	
+	}
+	.hl-google:hover {
+		background-color: black; /* Colore di sfondo più scuro */
+		color: white;	
+	}
+	.hl-amazon {
+		background-color: #f7981d; 
+		border-color: #f7981d; 
+		color: white;	
+	}
+	.hl-amazon:hover {
+		background-color: #e68a00; /* Colore di sfondo più scuro */
+		color: white;	
+	}
+  </style>
+
+<div style="width: 24em; height: 35.5em;" class="container">
+	<div class="row justify-content-center">
+		<div style="background-color: white; margin-top: 10px; margin-right: 10px; border: 4px solid #d3d3d3;" class="col-md-12  position-relative">
+
+			<!-- Pulsante di chiusura -->
+			<span id="close-button" class="hl-close-button">
+				<img src="images/close-button.png" title="Cliudi" alt="Cliudi">
+			</span>
+
+			<div class="text-center my-3">
+				<h4>Per continuare devi essere registrato ed eseguire il login</h4>
+			</div>
+
+			<!-- Divider with Text -->
+			<div class="hl-divider hl-social-buttons">
+				<div></div>
+				<span class="px-2">Continua con un profilo social...</span>
+				<div></div>
+			</div>
+
+			<!-- Social Login Buttons -->
+			<div class="text-center my-3">
+				<button id="hl-facebook-connect" class="btn btn-block hl-social hl-facebook" title="Login con Facebook">
+					<img src="images/facebook-logo.png" title="Login con Facebook" alt="Facebook Logo"> Login con <b>Facebook</b>
+				</button>
+				<button id="hl-instagram-connect" class="btn btn-block hl-social hl-instagram" title="Login con Instagram">
+					<img src="images/instagram-logo.png" title="Login con Instagram" alt="instagram Logo"> Login con <b>Instagram</b>
+				</button>
+				<button id="hl-google-connect" class="btn btn-block hl-social hl-google" title="Login con Google">
+					<img src="images/google-logo.png" title="Login con Google" alt="Google Logo"> Login con <b>Google</b>
+				</button>
+				<button id="hl-twitter-connect" class="btn btn-primary btn-block hl-social hl-twitter" title="Login con Twitter (X)">
+					<img src="images/x-logo.png" title="Login con Twitter (X)" alt="Twitter Logo"> Login con <b>Twitter (X)</b>
+				</button>
+				<button id="hl-amazon-connect" class="btn btn-block hl-social hl-amazon" title="Login con Amazon">
+					<img src="images/amazon-logo.png" title="Login con Amazon" alt="Amazon Logo"> Login con <b>Amazon</b>
+				</button>
+			</div>
+
+			<!-- Divider with Text -->
+			<div class="hl-divider hl-email hl-social-buttons">
+				<div></div>
+				<span class="px-2">Oppure con email e password...</span>
+				<div></div>
+			</div>
+
+			<!-- Manual Login Form -->
+			<form class="my-3 hl-email">
+				<div class="form-group">
+					<input id="hl-email-field" name="email" type="email" required="true" class="form-control" placeholder="Email">
+				</div>
+				<div class="form-group">
+					<input id="hl-password-field" name="password" type="password" required="true" class="form-control" placeholder="Password">
+				</div>
+				<div class="form-check">
+					<input id="hl-remember-me-field" name="remember-me" type="checkbox" class="form-check-input">
+					<label class="form-check-label" for="hl-remember-me-field">Ricordami</label>
+				</div>
+				<button id="hl-email-login" style="margin-top: .5em;" class="btn btn-success btn-block" type="button" title="Login con email e password">LOGIN</button>
+				<div class="text-center">
+					<a id="hl-register" href="#"><b>Registrati ora</b></a> | <a id="hl-password-resume" href="#">Password dimenticata?</a>
+				</div>
+			</form>
+			
+		</div>
+	</div>
+</div>
+
+<!-- Link agli script JS di Bootstrap e dipendenze -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
