@@ -15,10 +15,10 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Login Page</title>
-		<link rel="stylesheet" href="../src/hybridlogin.css?ver=0.0.1">
+		<link rel="stylesheet" href="../src/hybridlogin.css?ver=1">
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>	
 		<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>	
-		<script src="../src/hybridlogin.js?ver=0.0.111"></script>
+		<script src="../src/hybridlogin.js?ver=1"></script>
 	</head>
 
 	<body>

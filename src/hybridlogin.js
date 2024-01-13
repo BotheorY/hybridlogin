@@ -53,7 +53,7 @@ class hybridLogin {
 		if ($("#hl-main-div").length) {
 	
 			var overlayHTML = "<table id='hl-overlay'><tbody><tr><td style='vertical-align: middle; text-align: center;'></td></tr></tbody></table>";
-			var waitDIV = "<div id='hl-wait-div'><img style='width: 50%' src='" + this.#getScriptHomeURL() + "images/wait.gif'><div style='vertical-align: top; text-align: center;'><a href='javascript:hlObj.close()'><span style='color: white;'><big><b>" + this.local.cancelAndGoBack + "</b></big></span></a></div></div>";
+			var waitDIV = "<div id='hl-wait-div'><img style='width: 50%' src='" + this.#getScriptHomeURL() + "images/wait.gif'><div style='vertical-align: top; text-align: center;'><button id='hl-undo'  style='background-color: red;' onclick='hlObj.close()' type='button'><span id='hl-undo-text' style='color: white;'><big><b>" + this.local.cancelAndGoBack + "</b></big></span></button></div></div>";
 			$('body').append(overlayHTML);
 			$('body').append(waitDIV);
 					
