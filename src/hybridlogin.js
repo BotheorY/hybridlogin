@@ -66,22 +66,6 @@ class hybridLogin {
 				success: function(data) {
 					data = data.replace(/images\//g, templatesImagesURL);
 					$("#hl-main-div").html(data);
-					var mainHalfDivW = $("#hl-main-div").width() / 2;
-					var mainHalfDivH = $("#hl-main-div").height() / 2;
-
-/*					
-					$("#hl-main-div").css({
-						"left": "calc(50% - " + mainHalfDivW.toString() +"px)",
-						"top": "calc(50% - " + mainHalfDivH.toString() +"px)",
-					});
-					$("#hl-wait-div").css({
-						"width": $("#hl-main-div").width().toString() +"px",
-						"height": $("#hl-main-div").width().toString() +"px",
-						"left": "calc(50% - " + mainHalfDivW.toString() +"px)",
-						"top": "calc(50% - " + mainHalfDivW.toString() +"px)",
-					});
-*/					
-
 					$("#hl-wait-div").css({
 						"width": "24em",
 						"height": "24em",
@@ -108,8 +92,6 @@ class hybridLogin {
 							}
 						});
 					}
-
-
 					if ($("#close-button").length) {
 						$("#close-button").click(function() {
 							hlObj.close();
@@ -209,7 +191,7 @@ class hybridLogin {
 
 		try {
 			var err = null;
-			var cookieData = Cookies.get('hybridlogin');
+			var cookieData = Cookies.get(this.settings.app);
 			if (cookieData) {
 				var items = cookieData.split('|');
 				var email = items[0];
@@ -255,7 +237,7 @@ class hybridLogin {
 
 	disconnect() {
 
-		Cookies.remove('hybridlogin')
+		Cookies.remove(this.settings.app)
 
 		if ((!this.callbackWindow) && this.callback) {
 			this.callback(null, null, null, null);
@@ -264,6 +246,3 @@ class hybridLogin {
 	}
 		
 }
-
-
-

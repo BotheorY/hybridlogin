@@ -42,6 +42,7 @@ if (!empty($_POST)) {
     if (!empty($_POST['cmd'])) {
         $cmd = strtolower(trim($_POST['cmd']));
         if ($cmd === 'settings') {
+            $data['app'] = $config['app'];
             $data['emailLoginEnabled'] = $config['emailLoginEnabled'];
             $data['template'] = $config['template'];
             $providers = [];
@@ -64,10 +65,11 @@ if (!empty($_POST)) {
             $data = ['connected' => false];
             $db = get_database($err);
             if ($db) {
+                $app_code = mysqli_real_escape_string($db, $config['app']);
                 $email = trim($_POST['email']);
                 $accountType = strtoupper(trim($_POST['accountType']));
                 $password = $_POST['password'];
-                $sql = "SELECT hl_user.id_hl_user AS id, hl_user.email AS usermail, hl_user_accounts.account_pwd AS pwd, hl_user_accounts.account_data AS acc_data FROM hl_user INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (email = '$email') AND (account_type = '$accountType')";
+                $sql = "SELECT hl_user.id_hl_user AS id, hl_user.email AS usermail, hl_user_accounts.account_pwd AS pwd, hl_user_accounts.account_data AS acc_data FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = '$accountType')";
                 $res = $db->query($sql);
                 if($res) {
                     foreach ($res as $row) {
@@ -88,12 +90,24 @@ if (!empty($_POST)) {
                             $email = $row['usermail'];
                             if ($userProfile->email !== $email) {
                                 $email = $userProfile->email;
-                                $db->query("UPDATE hl_user SET email = '$email' WHERE id_hl_user = {$row['id']}");
+                                try {
+                                    $db->query("UPDATE hl_user SET email = '$email' WHERE id_hl_user = {$row['id']}");
+                                } catch(\Exception $e) {
+
+                                } 
                             }
                             $accountType = strtoupper($accountType);
-                            setcookie('hybridlogin', "$email|$accountType|{$row['pwd']}", time() + (30 * 24 * 60 * 60), "/");
+                            setcookie   (
+                                $config['app'], 
+                                "$email|$accountType|{$row['pwd']}", 
+                                [
+                                    'expires' => time() + (30 * 24 * 60 * 60),
+                                    'path' => '/',
+                                    'samesite' => 'None',
+                                ]
+                            );
                         } else {
-                            setcookie('hybridlogin', '', time() - 3600, '/');
+                            setcookie($config['app'], '', time() - 3600, '/');
                         }
                     }
                 }
@@ -127,35 +141,16 @@ class HybridLogin {
 
     }
 
-/*    
-    private function getDatabase() {
-
-        $err = '';
-        $db = get_database($err);
-
-        if ($db) {
-            return $db;
-        } else {
-            $this->lastError = $err;
-            return null;
-        }
-
-    }
-*/
-
     public function connectToTwitter(&$err = null) {
 
         try {
             $storage = new Session();
             $storage->set('provider', 'Twitter');
-
-//            $adapter = $this->hybridauth->authenticate('Twitter');
             $adapter = $this->hybridauth->getAdapter('Twitter');
             if ($adapter->isConnected()) {
                 $adapter->disconnect();
             }
             $adapter->authenticate();
-
             if ($adapter->isConnected()) {
                 $profile = $adapter->getUserProfile();
                 return $profile;

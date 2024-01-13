@@ -4,14 +4,17 @@ require_once 'settings.php';
 
 function hl_chk_login($email, $account, $hashed_password) {
 
+    global $config;
+    
     $result = false;
     $db = get_database();
 
     if ($db) {
+        $app_code = mysqli_real_escape_string($db, $config['app']);
         $email = mysqli_real_escape_string($db, trim($email));
         $account = strtoupper(trim($account));
         $pwd = mysqli_real_escape_string($db, trim($hashed_password));
-        $sql = "SELECT * FROM hl_user INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (email = '$email') AND (account_type = '$account') AND (account_pwd = '$pwd')";
+        $sql = "SELECT * FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = '$account') AND (account_pwd = '$pwd')";
         $res = $db->query($sql);
         if($res) {
             foreach ($res as $row) {
@@ -61,6 +64,7 @@ function get_database(&$err = null) {
         if ($err) {
             return null;
         } else {
+            $app_code = mysqli_real_escape_string($db, $config['app']);
             if (file_exists('database.sql')) {
                 $sql = file_get_contents('database.sql');
                 $queryArray = explode(';', $sql);
@@ -73,6 +77,14 @@ function get_database(&$err = null) {
                     }
                 }
             }
+            $sql =  "
+                        INSERT INTO hl_app (appcode)
+                        SELECT '$app_code'
+                        WHERE NOT EXISTS (
+                            SELECT 1 FROM hl_app WHERE appcode = '$app_code'
+                        )
+                    ";
+            $db->query($sql);
             return $db;
         }    
     } catch(\Exception $e){

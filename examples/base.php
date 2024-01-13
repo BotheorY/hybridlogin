@@ -18,7 +18,7 @@
 		<link rel="stylesheet" href="../src/hybridlogin.css?ver=0.0.1">
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>	
 		<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>	
-		<script src="../src/hybridlogin.js?ver=0.0.1"></script>
+		<script src="../src/hybridlogin.js?ver=0.0.111"></script>
 	</head>
 
 	<body>
@@ -74,7 +74,8 @@
 						alert("[ERROR] " + err);
 					} else {
 						if (appAuth) {
-							window.location.href = getCurrUrl({email: ''});
+//							window.location.href = getCurrUrl({email: ''});
+							window.location.href = getCurrUrl({});
 							return true;
 						} else {
 							connected = false;
@@ -91,6 +92,10 @@
 
 				if (parameters) {
 					url = url.split('?')[0] + '?' + new URLSearchParams(parameters).toString();
+				}
+
+				if (url.endsWith("?")) {
+					url = url.slice(0, -1);
 				}
 
 				return url;

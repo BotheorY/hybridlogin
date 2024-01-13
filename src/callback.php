@@ -46,17 +46,17 @@ try {
             $err = '';
             $db = get_database($err);
             if ($db) {
+                $app_code = mysqli_real_escape_string($db, $config['app']);
                 $user_exists = false;
-                $res = $db->query("SELECT * FROM hl_user WHERE email = '$email'");
+                $res = $db->query("SELECT hl_user.id_hl_user AS id FROM hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app WHERE (appcode = '$app_code') AND (email = '$email')");
                 if($res) {
                     foreach ($res as $row) {
-                        $id_user = (int)$row['id_hl_user'];
+                        $id_user = (int)$row['id'];
                         $user_exists = true;
                     }
                 }
                 if (!$user_exists) {
-                    $res = $db->query("INSERT INTO hl_user (email) VALUES ('$email')");
-                    $db->query($sql);
+                    $res = $db->query("INSERT INTO hl_user (id_hl_app, email) VALUES ((SELECT id_hl_app FROM hl_app WHERE (appcode = '$app_code')), '$email')");
                     $id_user = (int)$db->insert_id;
                 }
                 $account_exists = false;
@@ -75,7 +75,15 @@ try {
                     $sql = "INSERT INTO hl_user_accounts (id_hl_user, account_type, account_pwd, account_data) VALUES ($id_user, '$account_type', '$accountpwd', '$account_data')";
                 }
                 $db->query($sql);
-                setcookie('hybridlogin', "$email|$account_type|$account_pwd", time() + (30 * 24 * 60 * 60), "/");
+                setcookie   (
+                                $config['app'], 
+                                "$email|$account_type|$account_pwd", 
+                                [
+                                    'expires' => time() + (30 * 24 * 60 * 60),
+                                    'path' => '/',
+                                    'samesite' => 'None',
+                                ]
+                            );
                 echo    '
                             <!DOCTYPE html>
                             <html>

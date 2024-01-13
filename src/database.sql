@@ -7,14 +7,27 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+CREATE TABLE IF NOT EXISTS `hl_app` (
+  `id_hl_app` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `appcode` varchar(50) NOT NULL,
+  `appname` varchar(100) DEFAULT NULL,
+  `appdesc` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_hl_app`),
+  UNIQUE KEY `appcode_unique` (`appcode`),
+  KEY `appcode` (`appcode`),
+  KEY `id_hl_app` (`id_hl_app`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
 CREATE TABLE IF NOT EXISTS `hl_user` (
   `id_hl_user` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_hl_app` bigint(20) unsigned NOT NULL,
   `email` varchar(319) NOT NULL,
   `creation_datetime` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id_hl_user`),
-  UNIQUE KEY `email_unique` (`email`),
+  UNIQUE KEY `id_hl_app_email` (`id_hl_app`,`email`),
   KEY `email` (`email`),
-  KEY `id_hl_user` (`id_hl_user`)
+  KEY `id_hl_user` (`id_hl_user`),
+  KEY `id_hl_app` (`id_hl_app`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 CREATE TABLE IF NOT EXISTS `hl_user_accounts` (
@@ -28,7 +41,8 @@ CREATE TABLE IF NOT EXISTS `hl_user_accounts` (
   UNIQUE KEY `id_hl_user_account_type` (`id_hl_user`,`account_type`),
   KEY `id_hl_user` (`id_hl_user`),
   KEY `account_type` (`account_type`),
-  KEY `account_pwd` (`account_pwd`)
+  KEY `account_pwd` (`account_pwd`),
+  KEY `id_hl_user_accounts` (`id_hl_user_accounts`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

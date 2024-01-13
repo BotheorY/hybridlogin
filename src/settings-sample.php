@@ -1,6 +1,8 @@
 <?php
 
 $config = [
+
+	'app' => 'appname',
 	'emailLoginEnabled' => true,
 	'template' => 'standard-login-template',
     'emailSenderAddress' => 'info@domain.com',
@@ -54,4 +56,5 @@ $config = [
         ],
 
     ]
+
 ];
