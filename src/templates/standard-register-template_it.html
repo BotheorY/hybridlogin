@@ -1,0 +1,241 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+<script src="https://cdn.jsdelivr.net/npm/zxcvbn@4.4.2/dist/zxcvbn.js"></script>
+
+<style>
+	.password-icon {
+		cursor: pointer;
+	}
+	.hl-divider {
+		display: flex;
+		align-items: center;
+		text-align: center;
+	}
+	.hl-divider::before,
+	.hl-divider::after {
+		content: '';
+		flex: 1;
+		border-bottom: 1px solid #000;
+	}
+	.hl-divider::before {
+		margin-right: .25em;
+	}
+	.hl-divider::after {
+		margin-left: .25em;
+	}
+	.btn img {
+		margin-right: .25em;
+		height: 1.6em;
+		vertical-align: middle;
+	}			
+	.hl-close-button {
+		position: absolute;
+		top: -14px;
+		right: -10px;
+		font-size: 20px;
+		color: black;
+		cursor: pointer;
+	}
+	.hl-close-button img {
+		height:30px;
+	}	
+</style>
+
+<div style="width: 24em; height: 35.5em;" class="container">
+	<div class="row justify-content-center">
+		<div style="background-color: white; margin-top: 10px; margin-right: 10px; border: 4px solid #d3d3d3;" class="col-md-12  position-relative">
+
+			<!-- Pulsante di chiusura -->
+			<span id="close-button" class="hl-close-button">
+				<img src="images/close-button.png" title="Cliudi" alt="Cliudi">
+			</span>
+
+			<h2 class="text-center">REGISTRAZIONE</h2>
+			
+			<form>
+			<div class="form-group">
+				<label for="hl-email"><b>Email</b></label>
+				<input title="Inserisci il tuo migliore indirizzo email" type="email" placeholder="Inserisci il tuo indirizzo email" class="form-control" id="hl-email" maxlength="319" required>
+			</div>
+			
+			<div class="form-group">
+				<label for="hl-password"><b>Password</b></label>
+				<div class="input-group">
+					<input title="Inserisci la password" placeholder="Inserisci la password" type="password" class="form-control" id="hl-password" maxlength="60" required>
+					<div title="Mostra/nascondi la password" class="input-group-append">
+						<span class="input-group-text" onclick="togglePasswordVisibility()">
+							<i id="hl-togglePassword" class="fas fa-eye password-icon"></i>
+						</span>
+					</div>
+				</div>
+				<div id="passwordStrength"></div>
+			</div>
+			
+			<div id="hl-retype-password" class="form-group">
+				<label for="hl-retype-password-fld"><b>Ripeti la password</b></label>
+				<input id="hl-retype-password-fld" title="Inserisci di nuovo la password" placeholder="Inserisci di nuovo la password" type="password" class="form-control" maxlength="60" required>
+			</div>
+			
+			<div style="display: none;" id="hl-errors" class="alert alert-dismissable alert-danger"></div>
+
+			<button disabled="" id="hl-resgister-btn" type="button" class="col-md-12 btn btn-primary" title="Esegui la registrazione"><b>REGISTRATI</b></button>
+									
+			<div class="form-group">
+				<small>Registrandoti accetti la nostra <a id="hl-privacy" href="#" target="_blank"><span style="font-weight: bold;">informativa sulla privacy</span></a>.</small>
+			</div>
+			
+			<br><hr style="width: 100%; height: 2px;">
+			
+			<div style="text-align: center;" class="form-group">
+				<button id="hl-undo-registration" class="btn btn-secondary" type="button"><h6><i class="fas fa-arrow-left"></i>&nbsp;Torna indietro</h6></button>
+			</div>
+			
+		</div>
+	</div>
+</div>
+
+<script>
+
+    $('input').on('input', function(event) {
+
+		validateInput();
+
+    });
+
+	function validateInput() {
+
+		var errList = [];
+		var errMsg = '';
+
+		errMsg = validateEmail($('#hl-email'));
+		if (errMsg) {
+			errList.push(errMsg);
+		}
+
+		errMsg = validatePassword($('#hl-password'));
+		if (errMsg) {
+			errList.push(errMsg);
+		}
+
+		if (document.getElementById('hl-password').type.toLowerCase() === 'password') {
+			errMsg = validateRetypePassword($('#hl-retype-password-fld'));
+			if (errMsg) {
+				errList.push(errMsg);
+			}
+		}
+
+		hlObj.errorsOutput(errList);
+
+		if (errList.length) {
+			$("#hl-resgister-btn").prop('disabled', true);
+		} else {
+			$("#hl-resgister-btn").prop('disabled', false);
+		}
+
+	}
+
+	function validateEmail(emailFld) {
+
+		var veOut = '';
+
+        var email = emailFld.val();
+        var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+
+        if(regex.test(email)) {
+			emailFld.css({"border-color": "green", "box-shadow": "0 0 0 0.2rem lightgreen"});
+		} else {
+            veOut = hlObj.local.invalidEmailAddress;
+			emailFld.css({"border-color": "red", "box-shadow": "0 0 0 0.2rem pink"});
+        }
+
+		return veOut;
+
+	}
+
+	function validateRetypePassword(inputFld) {
+
+		var vrpOut = '';
+        var pwd = $('#hl-password').val();
+        var retypePwd = inputFld.val();
+
+		if (pwd === retypePwd) {
+			inputFld.css({"border-color": "green", "box-shadow": "0 0 0 0.2rem lightgreen"});
+		} else {
+			vrpOut = hlObj.local.passwordsDoNotMatch;
+			inputFld.css({"border-color": "red", "box-shadow": "0 0 0 0.2rem pink"});
+		}
+
+		return vrpOut;
+
+	}
+
+	function validatePassword(inputFld) {
+
+		var psOut = '';
+
+		function scoreToLevelHTML(scoreVal) {
+
+			var result = '';
+			psOut = hlObj.local.weakPassword;
+
+			if (scoreVal === 0) {
+				result = '<span style="font-weight: bold; color: red;">BASSA</span>';
+				inputFld.css({"border-color": "red", "box-shadow": "0 0 0 0.2rem pink"});
+			}
+
+			if ((scoreVal > 0) && (scoreVal < 3)) {
+				result = '<span style="font-weight: bold; color: green;">MEDIA</span>';
+				inputFld.css({"border-color": "green", "box-shadow": "0 0 0 0.2rem lightgreen"});
+				psOut = '';
+			}
+
+			if (scoreVal === 3) {
+				result = '<span style="font-weight: bold; color: green;">ALTA</span>';
+				inputFld.css({"border-color": "green", "box-shadow": "0 0 0 0.2rem lightgreen"});
+				psOut = '';
+			}
+
+			if (scoreVal === 4) {
+				result = '<span style="font-weight: bold; color: green;">MOLTO ALTA</span>';
+				inputFld.css({"border-color": "green", "box-shadow": "0 0 0 0.2rem lightgreen"});
+				psOut = '';
+			}
+
+			return result;
+
+		}
+
+        var pwd = inputFld.val();
+        var strength = zxcvbn(pwd);
+		var score = scoreToLevelHTML(parseInt(strength.score));
+        $('#passwordStrength').html('Forza password (min. MEDIA): ' + score);
+		return psOut;
+
+	}
+
+	function togglePasswordVisibility() {
+
+		var passwordInput = document.getElementById('hl-password');
+		var togglePasswordIcon = document.getElementById('hl-togglePassword');
+
+		if (passwordInput.type.toLowerCase() === 'password') {
+			passwordInput.type = 'text';
+			togglePasswordIcon.classList.remove('fa-eye');
+			togglePasswordIcon.classList.add('fa-eye-slash');
+			$('#hl-retype-password').prop('required', false);
+			$('#hl-retype-password').hide();
+		} else {
+			passwordInput.type = 'password';
+			togglePasswordIcon.classList.remove('fa-eye-slash');
+			togglePasswordIcon.classList.add('fa-eye');
+			$('#hl-retype-password').prop('required', true);
+			$('#hl-retype-password').show();
+		}
+
+		validateInput();
+
+	}
+	
+</script>

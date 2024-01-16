@@ -64,6 +64,7 @@ function get_database(&$err = null) {
         if ($err) {
             return null;
         } else {
+            $db->autocommit(true);
             $app_code = mysqli_real_escape_string($db, $config['app']);
             if (file_exists('database.sql')) {
                 $sql = file_get_contents('database.sql');
@@ -77,14 +78,11 @@ function get_database(&$err = null) {
                     }
                 }
             }
-            $sql =  "
-                        INSERT INTO hl_app (appcode)
-                        SELECT '$app_code'
-                        WHERE NOT EXISTS (
-                            SELECT 1 FROM hl_app WHERE appcode = '$app_code'
-                        )
-                    ";
-            $db->query($sql);
+            $sql = "INSERT INTO hl_app (appcode) VALUES ('$app_code')";
+            try {
+                $db->query($sql);
+            } catch(\Exception $e){
+            }
             return $db;
         }    
     } catch(\Exception $e){

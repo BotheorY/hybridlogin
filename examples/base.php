@@ -74,7 +74,6 @@
 						alert("[ERROR] " + err);
 					} else {
 						if (appAuth) {
-//							window.location.href = getCurrUrl({email: ''});
 							window.location.href = getCurrUrl({});
 							return true;
 						} else {

@@ -3,8 +3,10 @@
 $config = [
 
 	'app' => 'appname',
+	'privacyPageUrl' => 'https://mywebsite.com/privacy/',	// optional
 	'emailLoginEnabled' => true,
 	'template' => 'standard-login-template',
+	'registerTemplate' => 'standard-register-template',
     'emailSenderAddress' => 'info@domain.com',
     'emailSenderName' => 'Your name',
 	

@@ -19,44 +19,87 @@ class hybridLogin {
 
 	}
 
+	initRegister() {
+
+		if ($("#hl-main-div").length) {
+
+			var templatesImagesURL = this.scriptHomeURL + "templates/images/";	
+			var thisVar = this;
+			
+			$.ajax({
+				url: this.scriptHomeURL + "templates/" + this.settings.registerTemplate + "_" + this.lang + ".html?ver=" + Date.now().toString,
+				async: true,
+				success: function(data) {
+					data = data.replace(/images\//g, templatesImagesURL);
+					$("#hl-main-div").html(data);
+					
+					if ($("#close-button").length) {
+						$("#close-button").click(function() {
+							hlObj.closeRegister();
+						});						
+					}
+
+					if ($("#hl-undo-registration").length) {
+						$("#hl-undo-registration").click(function() {
+							hlObj.init('');
+						});						
+					}
+
+					if ($("#hl-privacy").length && thisVar.settings.hasOwnProperty('privacyPageUrl')) {
+						$("#hl-privacy").prop('href', thisVar.settings.privacyPageUrl);
+					}
+
+					$($("#hl-resgister-btn")).click(function() {
+						hlObj.register();
+					});						
+
+				}
+			});
+		}
+	
+	}
+
 	init(lang) {
 
 		if (this.lang === lang)	{
 			return true;
 		}	
 
-		this.lang = lang;
+		if (lang.trim()) {
+			this.lang = lang;
+		}
+
 		var thisVar = this;
-
-		$.ajax({
-			url: this.scriptHomeURL,
-			type: 'POST',
-			data: {cmd: "settings"},
-			dataType: 'json',
-			async: false,
-			success: function(data) {
-				thisVar.settings = data;
-			}
-		});
-
-		$.ajax({
-			url: this.scriptHomeURL,
-			type: 'POST',
-			data: {cmd: "local", lang: lang},
-			dataType: 'json',
-			async: false,
-			success: function(data) {
-				thisVar.local = data;
-			}
-		});
 		
 		if ($("#hl-main-div").length) {
-	
-			var overlayHTML = "<table id='hl-overlay'><tbody><tr><td style='vertical-align: middle; text-align: center;'></td></tr></tbody></table>";
-			var waitDIV = "<div id='hl-wait-div'><img style='width: 50%' src='" + this.#getScriptHomeURL() + "images/wait.gif'><div style='vertical-align: top; text-align: center;'><button id='hl-undo'  style='background-color: red;' onclick='hlObj.close()' type='button'><span id='hl-undo-text' style='color: white;'><big><b>" + this.local.cancelAndGoBack + "</b></big></span></button></div></div>";
-			$('body').append(overlayHTML);
-			$('body').append(waitDIV);
-					
+
+			if (!$("#hl-overlay").length) {
+				$.ajax({
+					url: this.scriptHomeURL,
+					type: 'POST',
+					data: {cmd: "settings"},
+					dataType: 'json',
+					async: false,
+					success: function(data) {
+						thisVar.settings = data;
+					}
+				});		
+				$.ajax({
+					url: this.scriptHomeURL,
+					type: 'POST',
+					data: {cmd: "local", lang: lang},
+					dataType: 'json',
+					async: false,
+					success: function(data) {
+						thisVar.local = data;
+					}
+				});			
+				var overlayHTML = "<table id='hl-overlay'><tbody><tr><td style='vertical-align: middle; text-align: center;'></td></tr></tbody></table>";
+				var waitDIV = "<div id='hl-wait-div'><img style='width: 50%' src='" + this.#getScriptHomeURL() + "images/wait.gif'><div style='vertical-align: top; text-align: center;'><button id='hl-undo'  style='background-color: red;' onclick='hlObj.close()' type='button'><span id='hl-undo-text' style='color: white;'><big><b>" + this.local.cancelAndGoBack + "</b></big></span></button></div></div>";
+				$('body').append(overlayHTML);
+				$('body').append(waitDIV);
+			}
+
 			var templatesImagesURL = this.scriptHomeURL + "templates/images/";	
 			var thisVar = this;
 			
@@ -96,6 +139,9 @@ class hybridLogin {
 						$("#close-button").click(function() {
 							hlObj.close();
 						});						
+					}
+					if ($("#hl-register").length) {
+						$("#hl-register").prop('href', 'javascript:hlObj.initRegister()');
 					}
 				}
 			});
@@ -150,6 +196,13 @@ class hybridLogin {
 				this.callbackWindow = null;
 			}
 		}
+
+	}
+
+	closeRegister() {
+
+		this.close();
+		this.init('');
 
 	}
 
@@ -243,6 +296,60 @@ class hybridLogin {
 			this.callback(null, null, null, null);
 		}
 
+	}	
+
+	errorsOutput(errors) {
+
+		var errDiv = $("#hl-errors");
+
+		if (errDiv.length) {
+			if (errors.length) {
+				var html = this.local.errorSectionTitle + '<ul class="hl-err-ul">';
+				for (let error of errors) {
+					html += '<li class="hl-err-item">' + error + '</li>'
+				}
+				html += '</ul>'
+				errDiv.html(html);
+				errDiv.show();
+			} else {
+				errDiv.hide();
+			}
+		}
+
 	}
-		
+
+	register() {
+
+		var email = $('#hl-email').val().trim();
+		var password = $('#hl-password').val().trim();
+		var thisVar = this;
+
+		$.ajax({
+			url: this.scriptHomeURL,
+			type: 'POST',
+			data: {cmd: "register", email: email, pwd: password, lang: thisVar.lang},
+			dataType: 'json',
+			async: true,
+			beforeSend: function(xhr) {
+				$("#hl-main-div").hide();
+				$("#hl-wait-div").show();
+			},
+			success: function(data) {
+				if (data.succeeded) {
+					alert(thisVar.local.registrationSucceeded);
+					thisVar.init('');
+					$("#hl-main-div").show();
+					//setTimeout(thisVar.callback(email, 'EMAIL', data.password, null), 500);	
+				} else {
+					thisVar.errorsOutput(data.err)
+					$("#hl-main-div").show();
+				}
+			},
+			complete: function(xhr, status) {
+				$("#hl-wait-div").hide();
+			}
+		});		
+
+	}
+	
 }

@@ -3,6 +3,10 @@
 require_once 'common.php';
 require_once 'vendor/autoload.php';
 
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', get_base_url() . 'php_err.txt');
+
 use Hybridauth\Hybridauth; 
 
 if (!empty($_GET)) {
@@ -43,8 +47,11 @@ if (!empty($_POST)) {
         $cmd = strtolower(trim($_POST['cmd']));
         if ($cmd === 'settings') {
             $data['app'] = $config['app'];
+            if (!empty($config['privacyPageUrl']))
+                $data['privacyPageUrl'] = $config['privacyPageUrl'];
             $data['emailLoginEnabled'] = $config['emailLoginEnabled'];
             $data['template'] = $config['template'];
+            $data['registerTemplate'] = $config['registerTemplate'];
             $providers = [];
             if ((!empty($config['providers'])) && is_array($config['providers'])) {
                 foreach ($config['providers'] as $key => $value) {
@@ -56,7 +63,8 @@ if (!empty($_POST)) {
         }
         if (($cmd === 'local') && (!empty($_POST['lang']))) {
             $lang = strtolower(trim($_POST['lang']));
-            include_once "languages/$lang.php";
+            if (file_exists("languages/$lang.php"))
+                include_once "languages/$lang.php";
             if ((!empty($local)) && is_array($local)) {
                 $data = $local;
             }
@@ -111,6 +119,115 @@ if (!empty($_POST)) {
                         }
                     }
                 }
+            }
+        }
+        if (($cmd === 'register') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && (!empty($_POST['lang']))) {
+            $data = ['succeeded' => false, 'err' => []];            
+            $email = trim($_POST['email']);
+            $pwd = trim($_POST['pwd']);
+            $lang = strtolower(trim($_POST['lang']));
+        /********************************************************** 
+        [START] Validation 
+        **********************************************************/
+            try {
+                if (file_exists("languages/$lang.php"))
+                    include_once "languages/$lang.php";
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $data['err'][] = $local['invalidEmailAddress'];
+                }
+                if (strlen($pwd) < 4) {
+                    $data['err'][] = $local['weakPassword'];
+                }
+            /* [START] Check user alredy exists */
+                $err = '';
+                $db = get_database($err);
+                if ($db) {
+                    $app_code = mysqli_real_escape_string($db, $config['app']);
+                    $user_exists = false;
+                    $res = $db->query("SELECT * FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = 'EMAIL')");
+                    if($res) {
+                        foreach ($res as $row) {
+                            $user_exists = true;
+                        }
+                    }
+                    if ($user_exists) {
+                        $data['err'][] = $local['userExists'];
+                    }
+                } else {
+                    $data['err'][] = $err;
+                }
+            /* [END] Check user alredy exists */
+            } catch(\Exception $e) {
+                $data = ['succeeded' => false];
+                $data['err'][] = $e->getMessage();
+            } 
+            $data['succeeded'] = count($data['err']) === 0;
+        /********************************************************** 
+        [END] Validation 
+        **********************************************************/
+            if ($data['succeeded']) {
+            /********************************************************** 
+            [START] Registration
+            **********************************************************/
+                try {
+                    $db->autocommit(false);
+                    $db->begin_transaction();
+                    $user_exists = false;
+                    if($db->query("SELECT hl_user.id_hl_user AS id FROM hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app WHERE (appcode = '$app_code') AND (email = '$email')")) {
+                        foreach ($res as $row) {
+                            $id_user = (int)$row['id'];
+                            $user_exists = true;
+                        }
+                    } else {
+                        $data = ['succeeded' => false];
+                        $data['err'][] = $db->error;
+                    }
+                    if ($data['succeeded']) {
+                        if (!$user_exists) {
+                            if ($db->query("INSERT INTO hl_user (id_hl_app, email) VALUES ((SELECT id_hl_app FROM hl_app WHERE (appcode = '$app_code')), '$email')")) {
+                                $id_user = (int)$db->insert_id;
+                            } else {
+                                $data = ['succeeded' => false];
+                                $data['err'][] = $db->error;
+                            }
+                        }
+                        if ($data['succeeded']) {
+                            $pwd = password_hash($pwd, PASSWORD_BCRYPT);
+                            $password = mysqli_real_escape_string($db, $pwd);
+                            $sql = "INSERT INTO hl_user_accounts (id_hl_user, account_type, account_pwd) VALUES ($id_user, 'EMAIL', '$password')";
+                            if ($db->query($sql)) {
+                                /*
+                                setcookie   (
+                                                $config['app'], 
+                                                "$email|EMAIL|$pwd", 
+                                                [
+                                                    'expires' => time() + (30 * 24 * 60 * 60),
+                                                    'path' => '/',
+                                                    'samesite' => 'None',
+                                                ]
+                                            );
+                                */
+                            } else {
+                                $data = ['succeeded' => false];
+                                $data['err'][] = $db->error;
+                            }
+                        }
+                    }
+                } catch(\Exception $e) {
+                    $data = ['succeeded' => false];
+                    $data['err'][] = $e->getMessage();
+                } finally {
+                    if ($data['succeeded']) {
+                        $data['password'] = $pwd;
+                        $db->commit();
+                    } else {
+                        $db->rollback();
+                    }
+                    $db->close();
+                }
+            /********************************************************** 
+            [END] Registration
+            **********************************************************/
             }
         }
     }
