@@ -116,7 +116,13 @@ class hybridLogin {
 						"top": "calc(50% - 12em)",
 						"text-align": "center"
 					});
-					if (!thisVar.settings.emailLoginEnabled) {
+					if (thisVar.settings.emailLoginEnabled) {
+						if ($("#hl-email-login").length) {
+							$("#hl-email-login").click(function() {
+								hlObj.emailLogin();
+							});						
+						}	
+					} else {
 						$(".hl-email").hide();
 					}
 					$(".hl-social").hide();
@@ -351,5 +357,41 @@ class hybridLogin {
 		});		
 
 	}
-	
+
+	emailLogin() {
+
+		var email = $('#hl-email-field').val().trim();
+		var password = $('#hl-password-field').val().trim();
+		var remember = false;
+		if ($("#hl-remember-me-field").length) {
+			remember = $("#hl-remember-me-field").prop('checked');
+		}
+		var thisVar = this;
+		$.ajax({
+			url: this.scriptHomeURL,
+			type: 'POST',
+			data: {cmd: "emailLogin", email: email, pwd: password, remember: remember},
+			dataType: 'json',
+			async: true,
+			beforeSend: function(xhr) {
+				$("#hl-main-div").hide();
+				$("#hl-wait-div").show();
+			},
+			success: function(data) {
+				if (data.succeeded) {
+					thisVar.close();
+					setTimeout(thisVar.callback(email, 'EMAIL', data.password, null), 500);	
+				} else {
+					alert(thisVar.local.loginFailed);
+					$("#hl-main-div").show();
+					$('#hl-email-field').focus();
+				}
+			},
+			complete: function(xhr, status) {
+				$("#hl-wait-div").hide();
+			}
+		});		
+
+	}
+
 }

@@ -195,19 +195,7 @@ if (!empty($_POST)) {
                             $pwd = password_hash($pwd, PASSWORD_BCRYPT);
                             $password = mysqli_real_escape_string($db, $pwd);
                             $sql = "INSERT INTO hl_user_accounts (id_hl_user, account_type, account_pwd) VALUES ($id_user, 'EMAIL', '$password')";
-                            if ($db->query($sql)) {
-                                /*
-                                setcookie   (
-                                                $config['app'], 
-                                                "$email|EMAIL|$pwd", 
-                                                [
-                                                    'expires' => time() + (30 * 24 * 60 * 60),
-                                                    'path' => '/',
-                                                    'samesite' => 'None',
-                                                ]
-                                            );
-                                */
-                            } else {
+                            if (!$db->query($sql)) {
                                 $data = ['succeeded' => false];
                                 $data['err'][] = $db->error;
                             }
@@ -228,6 +216,42 @@ if (!empty($_POST)) {
             /********************************************************** 
             [END] Registration
             **********************************************************/
+            }
+        }
+        if (($cmd === 'emaillogin') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && isset($_POST['remember'])) {
+            $data = ['succeeded' => false];            
+            $email = trim($_POST['email']);
+            $pwd = trim($_POST['pwd']);
+            $pwd = hl_chk_login($email, 'EMAIL', null, $pwd);
+            if ($_POST['remember'] === 'false') {
+                $remember = false;
+            } else {
+                $remember = true;
+            }
+            if ($pwd) {
+                $data['succeeded'] = true;            
+                $data['password'] = $pwd;            
+                if ($remember) {
+                    setcookie   (
+                        $config['app'], 
+                        "$email|EMAIL|$pwd", 
+                        [
+                            'expires' => time() + (30 * 24 * 60 * 60),
+                            'path' => '/',
+                            'samesite' => 'None',
+                        ]
+                    );
+                } else {
+                    setcookie   (
+                        $config['app'], 
+                        "$email|EMAIL|$pwd", 
+                        [
+                            'expires' => null,
+                            'path' => '/',
+                            'samesite' => 'None',
+                        ]
+                    );
+                }
             }
         }
     }

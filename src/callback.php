@@ -15,32 +15,23 @@ try {
 
     if ($provider = $storage->get('provider')) {
         $account_type = strtoupper($provider);
-        if ($account_type === 'EMAIL') {
-
-
-
-
-
-            $account_data = '';
-        } else {
-            $hybridauth->authenticate($provider);
-            $adapter = $hybridauth->getAdapter($provider);
-            if ($adapter->isConnected()) {
-                $profile = $adapter->getUserProfile();
-                $accessToken = $adapter->getAccessToken();
-                $adapter->disconnect();
+        $hybridauth->authenticate($provider);
+        $adapter = $hybridauth->getAdapter($provider);
+        if ($adapter->isConnected()) {
+            $profile = $adapter->getUserProfile();
+            $accessToken = $adapter->getAccessToken();
+            $adapter->disconnect();
 
 //file_put_contents('log.txt', json_encode($profile) . "\n\n", FILE_APPEND);  // debug
 //file_put_contents('log.txt', json_encode($accessToken) . "\n\n****************\n\n", FILE_APPEND);  // debug
 
-                $email = $profile->email;
-                $account_data = json_encode($accessToken);
-                $account_pwd = password_hash($account_data, PASSWORD_BCRYPT);
-            } else {
-                echo "<div><h2>ERROR</h2>Not connected.</div>";
-                exit;
-            }     
-        }
+            $email = $profile->email;
+            $account_data = json_encode($accessToken);
+            $account_pwd = password_hash($account_data, PASSWORD_BCRYPT);
+        } else {
+            echo "<div><h2>ERROR</h2>Not connected.</div>";
+            exit;
+        }     
         
         if (!empty($account_pwd)) {
             $err = '';

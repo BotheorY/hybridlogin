@@ -8,4 +8,5 @@ $local = [
 	'passwordsDoNotMatch' => "La prima e la seconda password non sono uguali.",
 	'userExists' => "Un utente con questa email è già registrato.",
 	'registrationSucceeded' => "Registrazione completata con successo.",
+	'loginFailed' => "Email e/o password errati. Accesso non consentito.",
 ];

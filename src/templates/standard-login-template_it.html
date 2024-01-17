@@ -1,5 +1,6 @@
 <!-- Link al CSS di Bootstrap -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
 
 <style>
 	.hl-divider {
@@ -120,26 +121,54 @@
 			</div>
 
 			<!-- Manual Login Form -->
-			<form class="my-3 hl-email">
-				<div class="form-group">
-					<input id="hl-email-field" name="email" type="email" required="true" class="form-control" placeholder="Email" maxlength="319">
+			<div class="form-group">
+				<input id="hl-email-field" name="email" type="email" required="true" class="form-control" maxlength="319" placeholder="Inserisci l'indirizzo email">
+			</div>
+			
+			<div class="form-group">
+				<div class="input-group">
+					<input title="Inserisci la password" placeholder="Inserisci la password" type="password" class="form-control" id="hl-password-field" maxlength="60" required="true">
+					<div title="Mostra/nascondi la password" class="input-group-append">
+						<span class="input-group-text" onclick="togglePasswordVisibility()">
+							<i id="hl-togglePassword" class="fas fa-eye password-icon"></i>
+						</span>
+					</div>
 				</div>
-				<div class="form-group">
-					<input id="hl-password-field" name="password" type="password" required="true" class="form-control" placeholder="Password" maxlength="60">
-				</div>
-				<div class="form-check">
-					<input id="hl-remember-me-field" name="remember-me" type="checkbox" class="form-check-input">
-					<label class="form-check-label" for="hl-remember-me-field">Ricordami</label>
-				</div>
-				<button id="hl-email-login" style="margin-top: .5em;" class="btn btn-success btn-block" type="button" title="Login con email e password">LOGIN</button>
-				<div class="text-center">
-					<a id="hl-register" href="#"><b>Registrati ora</b></a> | <a id="hl-password-resume" href="#">Password dimenticata?</a>
-				</div>
-			</form>
+			</div>
+
+			<div class="form-check">
+				<input id="hl-remember-me-field" name="remember-me" type="checkbox" class="form-check-input">
+				<label class="form-check-label" for="hl-remember-me-field">Ricordami</label>
+			</div>
+			<button id="hl-email-login" style="margin-top: .5em;" class="btn btn-success btn-block" type="button" title="Login con email e password" type="button">LOGIN</button>
+			<div class="text-center">
+				<a id="hl-register" href="#"><b>Registrati ora</b></a> | <a id="hl-password-resume" href="#">Password dimenticata?</a>
+			</div>
 			
 		</div>
 	</div>
 </div>
+
+<script>
+
+	function togglePasswordVisibility() {
+
+		var passwordInput = document.getElementById('hl-password-field');
+		var togglePasswordIcon = document.getElementById('hl-togglePassword');
+
+		if (passwordInput.type.toLowerCase() === 'password') {
+			passwordInput.type = 'text';
+			togglePasswordIcon.classList.remove('fa-eye');
+			togglePasswordIcon.classList.add('fa-eye-slash');
+		} else {
+			passwordInput.type = 'password';
+			togglePasswordIcon.classList.remove('fa-eye-slash');
+			togglePasswordIcon.classList.add('fa-eye');
+		}
+
+	}
+
+</script>
 
 <!-- Link agli script JS di Bootstrap e dipendenze -->
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.4/dist/umd/popper.min.js"></script>
