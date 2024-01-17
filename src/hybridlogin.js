@@ -12,6 +12,7 @@ class hybridLogin {
 		this.waitForConnectionInterval = null;
 		this.callbackWindow = null;
 		this.callback = null;
+		this.registerCallback = null;
 		this.scriptHomeURL = this.#getScriptHomeURL();
 		this.settings = null;
 		this.lang = '';
@@ -122,32 +123,56 @@ class hybridLogin {
 								hlObj.emailLogin();
 							});						
 						}	
+						if ($("#hl-register").length) {
+							if (thisVar.settings.registerEnabled) {
+								$("#hl-register").prop('href', 'javascript:hlObj.initRegister()');
+								$("#hl-register").show();
+							} else {
+								$("#hl-register").hide();
+							}
+						}
+						if ($("#hl-password-resume").length) {
+							if (!thisVar.settings.resumePasswordEnabled) {
+								$("#hl-password-resume").hide();
+							} else {
+								$("#hl-password-resume").show();
+							}
+						} 
+						if ($("#hl-register-resume").length) {
+							if ((!thisVar.settings.registerEnabled) && (!thisVar.settings.resumePasswordEnabled)) {
+								$("#hl-register-resume").hide();
+							} else {
+								$("#hl-register-resume").show();
+							}
+						} 
 					} else {
 						$(".hl-email").hide();
 					}
-					$(".hl-social").hide();
-					if (thisVar.settings.providers.length == 0) {
-						$(".hl-social-buttons").hide();
+					if (thisVar.settings.socialLoginEnabled) {
+						$(".hl-social-sect").show();
+						$(".hl-social").hide();
+						if (thisVar.settings.providers.length == 0) {
+							$(".hl-social-buttons").hide();
+						} else {
+							thisVar.settings.providers.forEach(function(provider) {
+								var providerName = provider;
+								provider = provider.toLowerCase();
+								$(".hl-" + provider).show();
+								var providerID = "#hl-" + provider + "-connect";
+								if ($(providerID).length) {
+									$(providerID).click(function() {
+										hlObj.connect(providerName);
+									});						
+								}
+							});
+						}
 					} else {
-						thisVar.settings.providers.forEach(function(provider) {
-							var providerName = provider;
-							provider = provider.toLowerCase();
-							$(".hl-" + provider).show();
-							var providerID = "#hl-" + provider + "-connect";
-							if ($(providerID).length) {
-								$(providerID).click(function() {
-									hlObj.connect(providerName);
-								});						
-							}
-						});
+						$(".hl-social-sect").hide();
 					}
 					if ($("#close-button").length) {
 						$("#close-button").click(function() {
 							hlObj.close();
 						});						
-					}
-					if ($("#hl-register").length) {
-						$("#hl-register").prop('href', 'javascript:hlObj.initRegister()');
 					}
 				}
 			});
@@ -155,9 +180,10 @@ class hybridLogin {
 	
 	}
 
-	start(callback = null, test = false) {
+	start(callback = null, test = false, registerCallback = null) {
 
 		this.callback = callback;
+		this.registerCallback = registerCallback;
 
 		if (test) {
 			this.chkConnection('');
@@ -342,10 +368,11 @@ class hybridLogin {
 			},
 			success: function(data) {
 				if (data.succeeded) {
-					alert(thisVar.local.registrationSucceeded);
+					if (thisVar.registerCallback) {
+						thisVar.registerCallback(email, data.password);
+					}
 					thisVar.init('');
 					$("#hl-main-div").show();
-					//setTimeout(thisVar.callback(email, 'EMAIL', data.password, null), 500);	
 				} else {
 					thisVar.errorsOutput(data.err)
 					$("#hl-main-div").show();
@@ -380,7 +407,9 @@ class hybridLogin {
 			success: function(data) {
 				if (data.succeeded) {
 					thisVar.close();
-					setTimeout(thisVar.callback(email, 'EMAIL', data.password, null), 500);	
+					if (thisVar.callback) {
+						setTimeout(thisVar.callback(email, 'EMAIL', data.password, null), 500);	
+					}
 				} else {
 					alert(thisVar.local.loginFailed);
 					$("#hl-main-div").show();

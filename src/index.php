@@ -10,7 +10,7 @@ ini_set('error_log', get_base_url() . 'php_err.txt');
 use Hybridauth\Hybridauth; 
 
 if (!empty($_GET)) {
-    if (!empty($_GET['provider'])) {
+    if ((!empty($_GET['provider'])) && $config['socialLoginEnabled']) {
         $sAuth = new HybridLogin();
         $err = '';
         $provider = trim($_GET['provider']);
@@ -49,7 +49,10 @@ if (!empty($_POST)) {
             $data['app'] = $config['app'];
             if (!empty($config['privacyPageUrl']))
                 $data['privacyPageUrl'] = $config['privacyPageUrl'];
+            $data['socialLoginEnabled'] = $config['socialLoginEnabled'];
             $data['emailLoginEnabled'] = $config['emailLoginEnabled'];
+            $data['registerEnabled'] = $config['registerEnabled'];
+            $data['resumePasswordEnabled'] = $config['resumePasswordEnabled'];
             $data['template'] = $config['template'];
             $data['registerTemplate'] = $config['registerTemplate'];
             $providers = [];
@@ -76,9 +79,13 @@ if (!empty($_POST)) {
                 $app_code = mysqli_real_escape_string($db, $config['app']);
                 $email = trim($_POST['email']);
                 $accountType = strtoupper(trim($_POST['accountType']));
-                $password = $_POST['password'];
-                $sql = "SELECT hl_user.id_hl_user AS id, hl_user.email AS usermail, hl_user_accounts.account_pwd AS pwd, hl_user_accounts.account_data AS acc_data FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = '$accountType')";
-                $res = $db->query($sql);
+                if ((($accountType !== 'EMAIL') && (!$config['socialLoginEnabled'])) || (($accountType === 'EMAIL') && (!$config['emailLoginEnabled']))) {
+                    $res = false;    
+                } else {
+                    $password = $_POST['password'];
+                    $sql = "SELECT hl_user.id_hl_user AS id, hl_user.email AS usermail, hl_user_accounts.account_pwd AS pwd, hl_user_accounts.account_data AS acc_data FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = '$accountType')";
+                    $res = $db->query($sql);
+                }
                 if($res) {
                     foreach ($res as $row) {
                         if ($row['pwd'] === $password) {
@@ -119,9 +126,10 @@ if (!empty($_POST)) {
                         }
                     }
                 }
+                $db->close();
             }
         }
-        if (($cmd === 'register') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && (!empty($_POST['lang']))) {
+        if (($cmd === 'register') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && (!empty($_POST['lang'])) && $config['registerEnabled']) {
             $data = ['succeeded' => false, 'err' => []];            
             $email = trim($_POST['email']);
             $pwd = trim($_POST['pwd']);
@@ -218,7 +226,7 @@ if (!empty($_POST)) {
             **********************************************************/
             }
         }
-        if (($cmd === 'emaillogin') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && isset($_POST['remember'])) {
+        if (($cmd === 'emaillogin') && (!empty($_POST['email'])) && (!empty($_POST['pwd'])) && isset($_POST['remember']) && $config['emailLoginEnabled']) {
             $data = ['succeeded' => false];            
             $email = trim($_POST['email']);
             $pwd = trim($_POST['pwd']);

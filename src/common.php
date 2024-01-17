@@ -5,7 +5,7 @@ require_once 'settings.php';
 function hl_chk_login($email, $account, $hashed_password, $password = null) {
 
     global $config;
-    
+
     $result = false;
     $db = get_database();
 
@@ -13,6 +13,10 @@ function hl_chk_login($email, $account, $hashed_password, $password = null) {
         $app_code = mysqli_real_escape_string($db, $config['app']);
         $email = mysqli_real_escape_string($db, trim($email));
         $account = strtoupper(trim($account));
+        if ((($account !== 'EMAIL') && (!$config['socialLoginEnabled'])) || (($account === 'EMAIL') && (!$config['emailLoginEnabled']))) {
+            $db->close();
+            return false;    
+        }
         if ($hashed_password) {
             $pwd = mysqli_real_escape_string($db, trim($hashed_password));
             $sql = "SELECT * FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = '$account') AND (account_pwd = '$pwd')";

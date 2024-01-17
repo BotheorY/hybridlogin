@@ -50,10 +50,10 @@
 					if (connected) {
 						hlObj.disconnect();
 					} else {
-						hlObj.start(login);
+						hlObj.start(login, false, registerCallback);
 					}
 				});
-				hlObj.start(login, true);
+				hlObj.start(login, true, registerCallback);
 			});
 	
 			function login(email, connType, password, err = null) {
@@ -83,6 +83,12 @@
 					}
 				}
 	
+			}
+
+			function registerCallback(email, password) {
+
+				alert(hlObj.local.registrationSucceeded);
+
 			}
 
 			function getCurrUrl(parameters) {

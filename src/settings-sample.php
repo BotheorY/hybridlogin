@@ -4,7 +4,10 @@ $config = [
 
 	'app' => 'appname',
 	'privacyPageUrl' => 'https://mywebsite.com/privacy/',	// optional
+	'socialLoginEnabled' => true,
 	'emailLoginEnabled' => true,
+	'registerEnabled' => true,
+	'resumePasswordEnabled' => true,
 	'template' => 'standard-login-template',
 	'registerTemplate' => 'standard-register-template',
     'emailSenderAddress' => 'info@domain.com',
@@ -16,14 +19,6 @@ $config = [
 	'dbPassword' => '...',
 
     'providers' => [
-
-        'Facebook' => [
-			'enabled' => true, 
-			'keys' => [
-				'id' => '...', 
-				'secret' => '...'
-			]
-		],
 		
         'Google' => [
             'enabled' => true, 
@@ -32,6 +27,14 @@ $config = [
                 'secret' => '...'
             ]
         ],
+
+        'Facebook' => [
+			'enabled' => true, 
+			'keys' => [
+				'id' => '...', 
+				'secret' => '...'
+			]
+		],
 
         'Instagram' => [
 			'enabled' => true, 

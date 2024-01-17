@@ -87,64 +87,71 @@
 				<h4>Per continuare devi essere registrato ed eseguire il login</h4>
 			</div>
 
+			<div class="hl-social-sect">
+
+				<!-- Divider with Text -->
+				<div class="hl-divider hl-social-buttons">
+					<div></div>
+					<span class="px-2">Continua con un profilo social...</span>
+					<div></div>
+				</div>
+
+				<!-- Social Login Buttons -->
+				<div class="text-center my-3">
+					<button id="hl-facebook-connect" class="btn btn-block hl-social hl-facebook" title="Login con Facebook">
+						<img src="images/facebook-logo.png" title="Login con Facebook" alt="Facebook Logo"> Login con <b>Facebook</b>
+					</button>
+					<button id="hl-instagram-connect" class="btn btn-block hl-social hl-instagram" title="Login con Instagram">
+						<img src="images/instagram-logo.png" title="Login con Instagram" alt="instagram Logo"> Login con <b>Instagram</b>
+					</button>
+					<button id="hl-google-connect" class="btn btn-block hl-social hl-google" title="Login con Google">
+						<img src="images/google-logo.png" title="Login con Google" alt="Google Logo"> Login con <b>Google</b>
+					</button>
+					<button id="hl-twitter-connect" class="btn btn-primary btn-block hl-social hl-twitter" title="Login con Twitter (X)">
+						<img src="images/x-logo.png" title="Login con Twitter (X)" alt="Twitter Logo"> Login con <b>Twitter (X)</b>
+					</button>
+					<button id="hl-amazon-connect" class="btn btn-block hl-social hl-amazon" title="Login con Amazon">
+						<img src="images/amazon-logo.png" title="Login con Amazon" alt="Amazon Logo"> Login con <b>Amazon</b>
+					</button>
+				</div>
+
+			</div>
+
 			<!-- Divider with Text -->
-			<div class="hl-divider hl-social-buttons">
-				<div></div>
-				<span class="px-2">Continua con un profilo social...</span>
-				<div></div>
-			</div>
+			<div style="margin-bottom: 1em;" class="hl-email">
 
-			<!-- Social Login Buttons -->
-			<div class="text-center my-3">
-				<button id="hl-facebook-connect" class="btn btn-block hl-social hl-facebook" title="Login con Facebook">
-					<img src="images/facebook-logo.png" title="Login con Facebook" alt="Facebook Logo"> Login con <b>Facebook</b>
-				</button>
-				<button id="hl-instagram-connect" class="btn btn-block hl-social hl-instagram" title="Login con Instagram">
-					<img src="images/instagram-logo.png" title="Login con Instagram" alt="instagram Logo"> Login con <b>Instagram</b>
-				</button>
-				<button id="hl-google-connect" class="btn btn-block hl-social hl-google" title="Login con Google">
-					<img src="images/google-logo.png" title="Login con Google" alt="Google Logo"> Login con <b>Google</b>
-				</button>
-				<button id="hl-twitter-connect" class="btn btn-primary btn-block hl-social hl-twitter" title="Login con Twitter (X)">
-					<img src="images/x-logo.png" title="Login con Twitter (X)" alt="Twitter Logo"> Login con <b>Twitter (X)</b>
-				</button>
-				<button id="hl-amazon-connect" class="btn btn-block hl-social hl-amazon" title="Login con Amazon">
-					<img src="images/amazon-logo.png" title="Login con Amazon" alt="Amazon Logo"> Login con <b>Amazon</b>
-				</button>
-			</div>
+				<div style="margin-bottom: 1em;" class="hl-divider hl-email hl-social-buttons hl-social-sect">
+					<div></div>
+					<span class="px-2">Oppure con email e password...</span>
+					<div></div>
+				</div>
 
-			<!-- Divider with Text -->
-			<div class="hl-divider hl-email hl-social-buttons">
-				<div></div>
-				<span class="px-2">Oppure con email e password...</span>
-				<div></div>
-			</div>
-
-			<!-- Manual Login Form -->
-			<div class="form-group">
-				<input id="hl-email-field" name="email" type="email" required="true" class="form-control" maxlength="319" placeholder="Inserisci l'indirizzo email">
-			</div>
-			
-			<div class="form-group">
-				<div class="input-group">
-					<input title="Inserisci la password" placeholder="Inserisci la password" type="password" class="form-control" id="hl-password-field" maxlength="60" required="true">
-					<div title="Mostra/nascondi la password" class="input-group-append">
-						<span class="input-group-text" onclick="togglePasswordVisibility()">
-							<i id="hl-togglePassword" class="fas fa-eye password-icon"></i>
-						</span>
+				<div class="form-group">
+					<input id="hl-email-field" name="email" type="email" required="true" class="form-control" maxlength="319" placeholder="Inserisci l'indirizzo email">
+				</div>
+				
+				<div class="form-group">
+					<div class="input-group">
+						<input title="Inserisci la password" placeholder="Inserisci la password" type="password" class="form-control" id="hl-password-field" maxlength="60" required="true">
+						<div title="Mostra/nascondi la password" class="input-group-append">
+							<span class="input-group-text" onclick="togglePasswordVisibility()">
+								<i id="hl-togglePassword" class="fas fa-eye password-icon"></i>
+							</span>
+						</div>
 					</div>
 				</div>
+
+				<div class="form-check">
+					<input id="hl-remember-me-field" name="remember-me" type="checkbox" class="form-check-input">
+					<label class="form-check-label" for="hl-remember-me-field">Ricordami</label>
+				</div>
+				<button id="hl-email-login" style="margin-top: .5em;" class="btn btn-success btn-block" type="button" title="Login con email e password" type="button"><b>LOGIN</b></button></button>
+				<div id="hl-register-resume" class="text-center">
+					<a id="hl-register" href="#"><b>Registrati ora</b></a> <a id="hl-password-resume" href="#">| Password dimenticata?</a>
+				</div>
+
 			</div>
 
-			<div class="form-check">
-				<input id="hl-remember-me-field" name="remember-me" type="checkbox" class="form-check-input">
-				<label class="form-check-label" for="hl-remember-me-field">Ricordami</label>
-			</div>
-			<button id="hl-email-login" style="margin-top: .5em;" class="btn btn-success btn-block" type="button" title="Login con email e password" type="button">LOGIN</button>
-			<div class="text-center">
-				<a id="hl-register" href="#"><b>Registrati ora</b></a> | <a id="hl-password-resume" href="#">Password dimenticata?</a>
-			</div>
-			
 		</div>
 	</div>
 </div>
