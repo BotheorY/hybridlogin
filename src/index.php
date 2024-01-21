@@ -181,7 +181,9 @@ if (!empty($_POST)) {
                     $db->autocommit(false);
                     $db->begin_transaction();
                     $user_exists = false;
-                    if($db->query("SELECT hl_user.id_hl_user AS id FROM hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app WHERE (appcode = '$app_code') AND (email = '$email')")) {
+                    $sql = "SELECT hl_user.id_hl_user AS id FROM hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app WHERE (appcode = '$app_code') AND (email = '$email')";
+                    $res = $db->query($sql);
+                    if($res) {
                         foreach ($res as $row) {
                             $id_user = (int)$row['id'];
                             $user_exists = true;
@@ -254,12 +256,34 @@ if (!empty($_POST)) {
                         $config['app'], 
                         "$email|EMAIL|$pwd", 
                         [
-                            'expires' => null,
                             'path' => '/',
                             'samesite' => 'None',
                         ]
                     );
                 }
+            }
+        }
+        if (($cmd === 'deleteemailaccount') && (!empty($_POST['email'])) && (!empty($_POST['pwd']))) {
+            $data = ['succeeded' => false];
+            try {
+                $db = get_database($err);
+                if ($db) {
+                    $app_code = mysqli_real_escape_string($db, $config['app']);
+                    $email = trim($_POST['email']);
+                    $pwd = mysqli_real_escape_string($db, trim($_POST['pwd']));
+                    $sql = "SELECT hl_user.id_hl_user AS id, id_hl_user_accounts FROM (hl_user INNER JOIN hl_app ON hl_user.id_hl_app = hl_app.id_hl_app) INNER JOIN hl_user_accounts ON hl_user.id_hl_user = hl_user_accounts.id_hl_user WHERE (appcode = '$app_code') AND (email = '$email') AND (account_type = 'EMAIL') AND (account_pwd = '$pwd')";
+                    $res = $db->query($sql);
+                    if($res) {
+                        foreach ($res as $row) {
+                            if ($db->query("DELETE FROM hl_user_accounts WHERE id_hl_user_accounts = {$row['id_hl_user_accounts']}")) {
+                                $data['succeeded'] = true;
+                            }
+                        }
+                    }
+                    $db->close();
+                }                    
+            } catch(\Exception $e) {
+                $data['succeeded'] = false;
             }
         }
     }

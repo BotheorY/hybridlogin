@@ -18,12 +18,13 @@
 		<link rel="stylesheet" href="../src/hybridlogin.css?ver=1">
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>	
 		<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>	
-		<script src="../src/hybridlogin.js?ver=1"></script>
+		<script src="../src/hybridlogin.js?ver=202"></script>
 	</head>
 
 	<body>
 
-		<button id="start-test"></button>
+	<div><button id="start-test"></button></div>
+	<div><button style="display: none;" id="delete-user">Delete logged in user</button></div>
 
 
 <?php if ($app_auth) { ?>
@@ -53,6 +54,13 @@
 						hlObj.start(login, false, registerCallback);
 					}
 				});
+				var delUserBtn = document.getElementById('delete-user');
+				delUserBtn.addEventListener('click', function() {
+					if (hlObj.deleteEmailAccount()) {
+						alert('User deleted');
+						window.location.href = getCurrUrl({});
+					}
+				});
 				hlObj.start(login, true, registerCallback);
 			});
 	
@@ -61,6 +69,11 @@
 				if (email) {
 					if (appAuth) {
 						$("#start-test").html("<center><b>Disconnect</b><br>(Logged in as " + email + ' via ' + connType + ') [' + password + ']</center>');
+						if (connType.toUpperCase().trim() === 'EMAIL') {
+							$("#delete-user").show();
+						} else {
+							$("#delete-user").hide();
+						}
 						if (!connected) {
 							connected = true;
 							alert("Logged in as " + email + ' via ' + connType);
@@ -79,6 +92,7 @@
 						} else {
 							connected = false;
 							$("#start-test").html("<b>Login</b>");
+							$("#delete-user").hide();
 						}
 					}
 				}

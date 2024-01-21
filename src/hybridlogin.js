@@ -423,4 +423,46 @@ class hybridLogin {
 
 	}
 
+	deleteEmailAccount(email = null, hashedPassword = null) {
+
+		try {
+			var result = false;
+			var currUser = false;
+			if ((!email) || (!hashedPassword)) {
+				var cookieData = Cookies.get(this.settings.app);
+				if (cookieData) {
+					var items = cookieData.split('|');
+					var accountType = items[1].toUpperCase();
+					if (accountType === 'EMAIL') {
+						email = items[0];
+						hashedPassword = items.slice(2).join();
+						currUser = true;
+					}
+				}	
+			}	
+			if (email && hashedPassword) {
+				var thisVar = this;
+				$.ajax({
+					url: this.scriptHomeURL,
+					type: 'POST',
+					data: {cmd: "deleteEmailAccount", email: email, pwd: hashedPassword},
+					dataType: 'json',
+					async: false,
+					success: function(data) {
+						if (data.succeeded) {
+							if (currUser) {
+								Cookies.remove(thisVar.settings.app);
+							}
+							result = true;
+						}
+					}
+				});								
+			}
+			return result;
+		} catch (error) {
+			return false;	
+		}
+
+	}
+
 }
